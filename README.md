@@ -1,67 +1,237 @@
-# Payload Blank Template
+# DealScope - Scalable Affiliate Site with Payload CMS
 
-This template comes configured with the bare minimum to get started on anything you need.
+A modern, scalable affiliate site built with Next.js 14, Payload CMS, and designed for growth from 10K to 10M+ visitors.
 
-## Quick start
+## 🚀 Architecture Overview
 
-This template can be deployed directly from our Cloud hosting and it will setup MongoDB and cloud S3 object storage for media.
+\`\`\`mermaid
+graph TB
+    A[Users] --> B[Vercel Edge Network]
+    B --> C[Next.js Frontend]
+    C --> D[Payload CMS API]
+    D --> E[PostgreSQL Database]
+    
+    F[GitHub Actions] --> G[Price Tracking]
+    G --> D
+    G --> H[ISR Revalidation]
+    H --> C
+    
+    I[Admin Panel] --> D
+    J[CSV Imports] --> D
+    
+    subgraph "Phase 1: MVP ($5-15/month)"
+        K[DigitalOcean Droplet]
+        K --> D
+        K --> E
+    end
+    
+    subgraph "Phase 2: Growth ($50-150/month)"
+        L[Managed PostgreSQL]
+        M[Redis Cache]
+        N[CDN]
+    end
+    
+    subgraph "Phase 3: Scale ($500+/month)"
+        O[Kubernetes Cluster]
+        P[Microservices]
+        Q[Real-time APIs]
+    end
+\`\`\`
 
-## Quick Start - local setup
+## 🛠 Tech Stack
 
-To spin up this template locally, follow these steps:
+### Backend (Payload CMS)
+- **CMS**: Payload CMS v2.8+ with TypeScript
+- **Database**: PostgreSQL with Payload's postgres adapter
+- **Admin Panel**: Built-in React admin interface
+- **API**: Automatic REST & GraphQL APIs
+- **Collections**: Products, Categories, Users, Newsletter, Media
 
-### Clone
+### Frontend (Next.js 14)
+- **Framework**: Next.js 14 with App Router
+- **Styling**: Tailwind CSS + shadcn/ui
+- **Deployment**: Vercel (Free tier → Pro)
+- **Caching**: Edge caching + ISR (1 hour revalidation)
 
-After you click the `Deploy` button above, you'll want to have standalone copy of this repo on your machine. If you've already cloned this repo, skip to [Development](#development).
+## 🚀 Quick Start
 
-### Development
+### 1. Clone and Install
+\`\`\`bash
+git clone <repository-url>
+cd dealscope-affiliate-site
+npm install
+\`\`\`
 
-1. First [clone the repo](#clone) if you have not done so already
-2. `cd my-project && cp .env.example .env` to copy the example environment variables. You'll need to add the `MONGODB_URI` from your Cloud project to your `.env` if you want to use S3 storage and the MongoDB database that was created for you.
+### 2. Environment Setup
+\`\`\`bash
+cp .env.example .env.local
+# Edit .env.local with your database credentials and Payload secret
+\`\`\`
 
-3. `pnpm install && pnpm dev` to install dependencies and start the dev server
-4. open `http://localhost:3000` to open the app in your browser
+### 3. Database Setup
+\`\`\`bash
+# Create PostgreSQL database
+createdb dealscope
 
-That's it! Changes made in `./src` will be reflected in your app. Follow the on-screen instructions to login and create your first admin user. Then check out [Production](#production) once you're ready to build and serve your app, and [Deployment](#deployment) when you're ready to go live.
+# Set DATABASE_URL in .env.local
+DATABASE_URL=postgresql://username:password@localhost:5432/dealscope
+\`\`\`
 
-#### Docker (Optional)
+### 4. Initialize Payload CMS
+\`\`\`bash
+# Build Payload admin panel
+npm run build:payload
 
-If you prefer to use Docker for local development instead of a local MongoDB instance, the provided docker-compose.yml file can be used.
+# Seed initial data
+node scripts/seed-payload.js
+\`\`\`
 
-To do so, follow these steps:
+### 5. Development
+\`\`\`bash
+# Start development server
+npm run dev
 
-- Modify the `MONGODB_URI` in your `.env` file to `mongodb://127.0.0.1/<dbname>`
-- Modify the `docker-compose.yml` file's `MONGODB_URI` to match the above `<dbname>`
-- Run `docker-compose up` to start the database, optionally pass `-d` to run in the background.
+# Access admin panel at http://localhost:3000/admin
+# Login with: admin@dealscope.com / admin123
+\`\`\`
 
-## How it works
+## 🎛 Payload CMS Collections
 
-The Payload config is tailored specifically to the needs of most websites. It is pre-configured in the following ways:
+### Products Collection
+- **Title, Slug, Description**: Product information
+- **Pricing**: Original price, current price, auto-calculated discount
+- **Category**: Relationship to categories
+- **Images**: Media uploads with responsive sizes
+- **Features**: Key product specifications
+- **Status**: Featured, trending, active flags
+- **SEO**: Meta tags and descriptions
 
-### Collections
+### Categories Collection
+- **Name, Slug, Description**: Category information
+- **Parent**: Support for subcategories
+- **Product Count**: Auto-calculated
+- **SEO**: Meta optimization
 
-See the [Collections](https://payloadcms.com/docs/configuration/collections) docs for details on how to extend this functionality.
+### Users Collection
+- **Authentication**: Built-in user management
+- **Roles**: Admin, Editor, User levels
+- **Access Control**: Collection-level permissions
 
-- #### Users (Authentication)
+### Newsletter Collection
+- **Email Management**: Subscriber tracking
+- **Preferences**: Category interests, frequency
+- **Source Tracking**: Signup attribution
 
-  Users are auth-enabled collections that have access to the admin panel.
+## 📊 Admin Panel Features
 
-  For additional help, see the official [Auth Example](https://github.com/payloadcms/payload/tree/main/examples/auth) or the [Authentication](https://payloadcms.com/docs/authentication/overview#authentication-overview) docs.
+### Content Management
+- **Rich Text Editor**: For product descriptions
+- **Media Library**: Image upload and management
+- **Bulk Operations**: CSV imports and exports
+- **Version Control**: Content revisions and drafts
 
-- #### Media
+### E-commerce Features
+- **Price Tracking**: Historical price data
+- **Affiliate Links**: Managed affiliate URLs
+- **Product Status**: Featured/trending controls
+- **Category Management**: Hierarchical organization
 
-  This is the uploads enabled collection. It features pre-configured sizes, focal point and manual resizing to help you manage your pictures.
+### User Management
+- **Role-based Access**: Admin, Editor, User roles
+- **Authentication**: Secure login system
+- **Permissions**: Fine-grained access control
 
-### Docker
+## 🔄 Data Flow
 
-Alternatively, you can use [Docker](https://www.docker.com) to spin up this template locally. To do so, follow these steps:
+1. **Admin creates content** in Payload CMS admin panel
+2. **Next.js fetches data** via Payload's Local API
+3. **ISR regenerates** static pages every hour
+4. **Vercel Edge Cache** serves content globally
+5. **Price tracking updates** products automatically
 
-1. Follow [steps 1 and 2 from above](#development), the docker-compose file will automatically use the `.env` file in your project root
-1. Next run `docker-compose up`
-1. Follow [steps 4 and 5 from above](#development) to login and create your first admin user
+## 📈 Scaling Pathway
 
-That's it! The Docker instance will help you get up and running quickly while also standardizing the development environment across your teams.
+| Phase | Traffic | Infrastructure | Monthly Cost | Key Features |
+|-------|---------|---------------|--------------|--------------|
+| **MVP** | 10K-100K | Single Droplet + Vercel | $5-15 | Payload CMS, ISR, File uploads |
+| **Growth** | 100K-1M | Managed DB + Cloud Storage | $50-150 | Real-time sync, CDN, Redis |
+| **Scale** | 1M-10M+ | Kubernetes + Microservices | $500+ | Auto-scaling, Global distribution |
 
-## Questions
+## 🚀 Production Deployment
 
-If you have any issues or questions, reach out to us on [Discord](https://discord.com/invite/payload) or start a [GitHub discussion](https://github.com/payloadcms/payload/discussions).
+### Option A: Single Server (MVP)
+\`\`\`bash
+# Build for production
+npm run build
+
+# Start production server
+npm start
+
+# Admin panel available at /admin
+\`\`\`
+
+### Option B: Docker Deployment
+\`\`\`bash
+# Build and run with Docker
+docker-compose up -d
+
+# Access admin panel at http://localhost:3000/admin
+\`\`\`
+
+### Option C: Separate Services
+- Deploy Next.js to Vercel
+- Deploy Payload CMS to Railway/Render/DigitalOcean
+- Use managed PostgreSQL (Neon/Supabase/Railway)
+
+## 🎨 Content Strategy
+
+### Product Management
+1. **Import via CSV**: Bulk product uploads
+2. **Manual Entry**: Individual product creation
+3. **API Integration**: Connect to affiliate networks
+4. **Price Monitoring**: Automated price updates
+
+### Category Structure
+- **Electronics**: Gadgets, phones, computers
+- **Home & Garden**: Furniture, appliances, tools
+- **Fashion**: Clothing, shoes, accessories
+- **Health & Beauty**: Skincare, wellness, beauty
+
+### SEO Optimization
+- **Auto-generated slugs** from titles
+- **Meta tags** for all content types
+- **Schema markup** for products
+- **Sitemap generation** from Payload data
+
+## 🔧 Key Features
+
+### Payload CMS Benefits
+- **Type-safe**: Full TypeScript support
+- **Flexible**: Customizable fields and collections
+- **Scalable**: Built for enterprise applications
+- **Developer-friendly**: Code-first configuration
+- **Self-hosted**: Full control over your data
+
+### Performance Optimization
+- **ISR**: 1-hour revalidation for optimal performance
+- **Edge Caching**: Vercel's global edge network
+- **Image Optimization**: Payload's responsive images
+- **Lazy Loading**: Components load on demand
+
+## 🛡 Security & Access Control
+
+### Authentication
+- **Secure login** with bcrypt password hashing
+- **JWT tokens** for API authentication
+- **Role-based access** control
+- **CSRF protection** built-in
+
+### Data Protection
+- **Environment variables** for sensitive data
+- **Database encryption** support
+- **File upload validation** with type checking
+- **Rate limiting** for API endpoints
+
+---
+
+*Built with ❤️ using Payload CMS for scalable affiliate marketing*

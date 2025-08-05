@@ -1,0 +1,40 @@
+name: Daily Price Tracking
+
+on:
+  schedule:
+    # Run daily at 6 AM UTC
+    - cron: '0 6 * * *'
+  workflow_dispatch: # Allow manual trigger
+
+jobs:
+  track-prices:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+        
+    - name: Install dependencies
+      run: |
+        cd scripts
+        npm init -y
+        npm install node-fetch pg
+        
+    - name: Run price tracker
+      env:
+        DATABASE_URL: ${{ secrets.DATABASE_URL }}
+      run: node scripts/price-tracker.js
+      
+    - name: Trigger ISR revalidation
+      env:
+        VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+        VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+      run: |
+        curl -X POST \
+          "https://api.vercel.com/v1/integrations/deploy-hooks/${{ secrets.DEPLOY_HOOK_ID }}" \
+          -H "Authorization: Bearer $VERCEL_TOKEN"

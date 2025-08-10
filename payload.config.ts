@@ -3,13 +3,12 @@ import { mongooseAdapter } from "@payloadcms/db-mongodb"
 import { slateEditor } from "@payloadcms/richtext-slate" // Still using slateEditor for now
 import { buildConfig } from "payload"
 
-import {Users} from "./src/collections/Users"
-import Categories from "./src/collections/Categories"
-import Products from "./src/collections/Products"
-import PriceHistory from "./src/collections/PriceHistory"
-import NewsletterSubscribers from "./src/collections/NewsletterSubscribers"
-import {Media} from "./src/collections/Media"
-
+import { Users } from "./src/collections/Users"
+import { Categories } from "./src/collections/Categories"
+import { Products } from "./src/collections/Products"
+import { PriceHistory } from "./src/collections/PriceHistory"
+import { NewsletterSubscribers } from "./src/collections/NewsletterSubscribers"
+import { Media } from "./src/collections/Media"
 export default buildConfig({
   admin: {
     user: Users.slug,

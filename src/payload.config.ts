@@ -9,6 +9,10 @@ import sharp from 'sharp'
 // Use dynamic imports to avoid circular dependencies
 const Users = (await import('./collections/Users')).Users
 const Media = (await import('./collections/Media')).Media
+const Categories = (await import('./collections/Categories')).Categories
+const NewsletterSubscribers = (await import('./collections/NewsletterSubscribers')).NewsletterSubscribers
+const PriceHistory = (await import('./collections/PriceHistory')).PriceHistory
+const Products = (await import('./collections/Products')).Products
 
 const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
@@ -20,7 +24,7 @@ export default buildConfig({
       baseDir: path.resolve(dirname),
     },
   },
-  collections: [Users, Media],
+  collections: [Users, Media, Categories, NewsletterSubscribers, PriceHistory, Products],
   editor: lexicalEditor(),
   secret: process.env.PAYLOAD_SECRET || '',
   typescript: {

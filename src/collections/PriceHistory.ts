@@ -1,6 +1,6 @@
 import type { CollectionConfig } from "payload/types"
 
-const PriceHistory: CollectionConfig = {
+export const PriceHistory: CollectionConfig = {
   slug: "price-history",
   admin: {
     useAsTitle: "product",
@@ -109,5 +109,3 @@ const PriceHistory: CollectionConfig = {
     ],
   },
 }
-
-export default PriceHistory

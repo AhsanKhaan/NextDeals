@@ -1,6 +1,6 @@
-import type { CollectionConfig } from "payload/types"
+import type { CollectionConfig } from "payload"
 
-const Categories: CollectionConfig = {
+export const Categories: CollectionConfig = {
   slug: "categories",
   admin: {
     useAsTitle: "name",
@@ -227,10 +227,18 @@ const Categories: CollectionConfig = {
 
         // Calculate category level based on parent
         if (data.parent) {
-          const parent = await req.payload.findByID({
-            collection: "categories",
-            id: data.parent,
-          })
+          try {
+            const parent = await req.payload.findByID({
+              collection: "categories",
+              id: data.parent,
+            })
+            if (!parent) {
+              throw new Error("Parent category not found")
+            }
+            data.parent = parent.id // Ensure parent is set correctly
+          } catch (error) {
+            console.error("Error fetching parent category:", error)
+          }
           data.level = (parent.level || 0) + 1
         } else {
           data.level = 0
@@ -265,4 +273,3 @@ const Categories: CollectionConfig = {
   },
 }
 
-export default Categories

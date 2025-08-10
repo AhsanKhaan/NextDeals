@@ -28,12 +28,31 @@ export const getPayloadClient = async (initOptions?: Partial<InitOptions>): Prom
     return cached.client
   }
 
-  if (!cached.promise) {
+  if (process.env.ENV === 'dev') {
+
+    // Bypass cache in dev mode
+    const freshPayload = await getPayload({
+      config: payloadConfig,
+      secret: process.env.PAYLOAD_SECRET,
+      local: !initOptions?.express,
+      ...initOptions,
+    }).then((payload) => {
+
+      console.log('Fresh payload collections:', Object.keys(payload.collections))
+      return payload
+    })
+    return freshPayload
+
+  } else if (!cached.promise) {
+
     cached.promise = getPayload({
       config: payloadConfig,
       secret: process.env.PAYLOAD_SECRET,
       local: !initOptions?.express,
       ...initOptions,
+    }).then((payload) => {
+      console.log('Payload initialized with collections:', Object.keys(payload.collections)) // Add this
+      return payload
     })
   }
 

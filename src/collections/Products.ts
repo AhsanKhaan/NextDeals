@@ -1,6 +1,6 @@
 import type { CollectionConfig } from "payload/types"
 
-const Products: CollectionConfig = {
+export const Products: CollectionConfig = {
   slug: "products",
   admin: {
     useAsTitle: "title",
@@ -347,5 +347,3 @@ const Products: CollectionConfig = {
     ],
   },
 }
-
-export default Products

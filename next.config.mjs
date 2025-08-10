@@ -1,4 +1,5 @@
 /** @type {import('next').NextConfig} */
+import path from 'path';
 const nextConfig = {
   eslint: {
     ignoreDuringBuilds: true,
@@ -35,7 +36,8 @@ const nextConfig = {
   transpilePackages: [
     'payload',
     '@payloadcms/bundler-webpack',
-    '@payloadcms/next-payload'
+    '@payloadcms/next-payload',
+    '@aws-sdk/client-sts'
   ],
   swcMinify: true,
   compress: true,
@@ -43,7 +45,21 @@ const nextConfig = {
   generateBuildId: async () => {
     return process.env.GIT_HASH || `build-${Date.now()}`
   },
-  webpack: (config, { isServer }) => {
+  webpack: (config, { isServer, dev }) => {
+    // Disable cache in development if issues persist
+    if (dev) {
+      config.cache = false;
+    }
+    // Add this fallback configuration
+    config.resolve.fallback = {
+      ...config.resolve.fallback,
+      '@aws-sdk/nested-clients/sts': path.resolve(process.cwd(), 'node_modules/@aws-sdk/client-sts')
+    };
+    // Add path alias configuration
+    config.resolve.alias = {
+      ...config.resolve.alias,
+      '@': path.resolve(process.cwd(), 'src'), // This assumes your components are in src/components
+    };
     // Ignore .d.ts files
     config.module.rules.push({
       test: /\.d\.ts$/,

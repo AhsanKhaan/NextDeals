@@ -13,7 +13,8 @@
     "generate:types": "cross-env NODE_OPTIONS='--no-deprecation' payload generate:types",
     "docker:build": "docker build -t dealscope-payload .",
     "docker:run": "docker-compose up -d",
-    "seed": "node scripts/seed-payload-mongodb.js",
+    "seed": "node scripts/direct-mongodb-seed.js",
+    "seed:payload": "tsx scripts/seed-payload-mongodb.js",
     "devsafe": "rm -rf .next && cross-env NODE_OPTIONS=--no-deprecation next dev",
     "generate:importmap": "cross-env NODE_OPTIONS=--no-deprecation payload generate:importmap",
     "test": "pnpm run test:int && pnpm run test:e2e",
@@ -21,8 +22,13 @@
     "test:int": "cross-env NODE_OPTIONS=--no-deprecation vitest run --config ./vitest.config.mts"
   },
   "dependencies": {
+    "graphql": "^16.8.1",
+    "@aws-sdk/client-sts": "^3.859.0",
+    "@aws-sdk/credential-provider-ini": "^3.859.0",
+    "@aws-sdk/credential-provider-sso": "^3.859.0",
+    "@aws-sdk/credential-providers": "^3.859.0",
+    "@aws-sdk/token-providers": "^3.859.0",
     "@hookform/resolvers": "3.9.1",
-    "@payloadcms/bundler-webpack": "^1.0.7",
     "@payloadcms/db-mongodb": "3.49.0",
     "@payloadcms/next": "3.49.0",
     "@payloadcms/next-payload": "^0.1.11",
@@ -88,7 +94,8 @@
     "tailwindcss": "^3.4.17",
     "typescript": "^5.7.3",
     "vite-tsconfig-paths": "5.1.4",
-    "vitest": "3.2.3"
+    "vitest": "3.2.3",
+    "tsx": "^4.16.2"
   },
   "resolutions": {
     "esbuild": "0.25.0",

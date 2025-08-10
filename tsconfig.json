@@ -23,9 +23,10 @@
       }
     ],
     "paths": {
-      "@/*": [
-        "./src/*"
-      ],
+            "@/*": ["./*"],
+      "@/components/*": ["./components/*"],
+      "@/lib/*": ["./lib/*"],
+      "@/hooks/*": ["./hooks/*"],
       "@payload-config": [
         "./src/payload.config.ts"
       ]
@@ -37,7 +38,7 @@
     "**/*.ts",
     "**/*.tsx",
     ".next/types/**/*.ts"
-  ],
+, "scripts/seed-payload-mongodb.js", "payload.config.cjs"  ],
   "exclude": [
     "node_modules"
   ],

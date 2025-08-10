@@ -1,21 +1,53 @@
 import dotenv from 'dotenv';
-dotenv.config();
+import path from 'path';
+import { fileURLToPath } from 'url';
+
+// Get current directory path in ES module
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+// Load .env from the correct location
+const envPath = path.resolve(__dirname, '../.env');
+console.log('Loading .env from:', envPath);
+
+dotenv.config({ path: envPath });
+
+// Verify the variables loaded
+console.log('PAYLOAD_SECRET:', process.env.PAYLOAD_SECRET);
+console.log('MONGODB_URI:', process.env.DATABASE_URI);
+
 import { getPayload } from 'payload';
 
 // Point to the compiled JS config
-import payloadConfig from '../payload.config.js' assert { type: 'ts' };
+const payloadConfig = (await import('../payload.config.js')).default;
 
 
 const seed = async () => {
-  console.log("🚀 Seeding Payload CMS with MongoDB...")
- 
-    
-    // Initialize Payload with config
+  console.log("path", process.env);
+  try {
+    console.log("🚀 Seeding Payload CMS with MongoDB...")
+    console.log("Using config:", payloadConfig);
     const payload = await getPayload({
-      secret: process.env.PAYLOAD_SECRET,
-      local: true,
-      config: payloadConfig
+      config: {
+        ...payloadConfig,
+        secret: process.env.PAYLOAD_SECRET || 'your-secret-here',
+        local: true,
+        onInit: async (payload) => {
+          console.log("Payload initialized successfully");
+          await seedData(payload);
+        }
+      },
+      mongoURL: process.env.DATABASE_URI || 'mongodb://localhost:27017/next'
     });
+  } catch (error) {
+    console.error("❌ Initialization failed:", error);
+    process.exit(1);
+  }
+  
+}
+
+async function seedData(payload) {
+ 
 
   // Create admin user
   const adminUser = await payload.create({

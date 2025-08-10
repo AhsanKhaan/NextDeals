@@ -1,6 +1,5 @@
 import path from "path"
 import { mongooseAdapter } from "@payloadcms/db-mongodb"
-import { webpackBundler } from "@payloadcms/bundler-webpack"
 import { slateEditor } from "@payloadcms/richtext-slate" // Still using slateEditor for now
 import { buildConfig } from "payload"
 
@@ -14,25 +13,14 @@ import {Media} from "./src/collections/Media"
 export default buildConfig({
   admin: {
     user: Users.slug,
-    bundler: webpackBundler(),
-    webpack: (config) => ({
-      ...config,
-      resolve: {
-        ...config.resolve,
-        alias: {
-          ...config.resolve?.alias,
-          "@": path.resolve(__dirname, "./"),
-        },
-      },
-    }),
   },
   editor: slateEditor({}), // Ensure this is compatible with v3
   collections: [Users, Categories, Products, PriceHistory, NewsletterSubscribers, Media],
   typescript: {
-    outputFile: path.resolve(__dirname, "payload-types.ts"),
+    outputFile: path.resolve(process.cwd(), "payload-types.ts"),
   },
   graphQL: {
-    schemaOutputFile: path.resolve(__dirname, "generated-schema.graphql"),
+    schemaOutputFile: path.resolve(process.cwd(), "generated-schema.graphql"),
   },
   plugins: [],
   db: mongooseAdapter({
@@ -41,7 +29,6 @@ export default buildConfig({
       maxPoolSize: 20,
       serverSelectionTimeoutMS: 5000,
       socketTimeoutMS: 45000,
-      bufferMaxEntries: 0,
       bufferCommands: false,
     },
   }),
@@ -50,11 +37,5 @@ export default buildConfig({
   // For Next.js App Router, these are often handled by Next.js itself or middleware.
   // If you are running Payload as a standalone server, you might need to configure these in your server entry file.
   // For this integrated setup, Payload's internal server will handle it.
-  rateLimit: {
-    max: 2000,
-    windowMs: 15 * 60 * 1000,
-    skip: (req) => {
-      return req.url?.includes("/media") || req.url?.includes("/api/health")
-    },
-  },
+  // rateLimit is not a valid property in Payload v3 config and should be configured at the server/middleware level if needed.
 })

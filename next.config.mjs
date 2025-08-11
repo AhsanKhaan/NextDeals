@@ -39,7 +39,7 @@ const nextConfig = {
     '@payloadcms/next-payload',
     '@aws-sdk/client-sts'
   ],
-  swcMinify: true,
+  // swcMinify: true,
   compress: true,
   poweredByHeader: false,
   generateBuildId: async () => {

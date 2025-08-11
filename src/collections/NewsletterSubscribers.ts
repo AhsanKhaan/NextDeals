@@ -72,4 +72,4 @@ export const NewsletterSubscribers: CollectionConfig = {
   timestamps: true,
 }
 
-export default NewsletterSubscribers
+ 

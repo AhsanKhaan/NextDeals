@@ -1,4 +1,4 @@
-import type { CollectionConfig } from "payload/types"
+import type { CollectionConfig } from "payload"
 
 export const Products: CollectionConfig = {
   slug: "products",
@@ -9,67 +9,11 @@ export const Products: CollectionConfig = {
   access: {
     read: () => true,
   },
-  // MongoDB indexes for high performance queries
-  indexes: [
-    {
-      fields: {
-        slug: 1,
-      },
-      options: {
-        unique: true,
-      },
-    },
-    {
-      fields: {
-        category: 1,
-        "status.isActive": 1,
-      },
-    },
-    {
-      fields: {
-        "status.isFeatured": 1,
-        "status.isActive": 1,
-      },
-    },
-    {
-      fields: {
-        "status.isTrending": 1,
-        "status.isActive": 1,
-      },
-    },
-    {
-      fields: {
-        "pricing.currentPrice": 1,
-        "status.isActive": 1,
-      },
-    },
-    {
-      fields: {
-        rating: -1,
-        "status.isActive": 1,
-      },
-    },
-    {
-      fields: {
-        createdAt: -1,
-      },
-    },
-    // Text search index for product search
-    {
-      fields: {
-        title: "text",
-        description: "text",
-        shortDescription: "text",
-        brand: "text",
-      },
-    },
-  ],
   fields: [
     {
       name: "title",
       type: "text",
       required: true,
-      index: true,
       admin: {
         description: "Product name/title",
       },
@@ -79,7 +23,6 @@ export const Products: CollectionConfig = {
       type: "text",
       required: true,
       unique: true,
-      index: true,
       admin: {
         description: "URL-friendly version of the title",
       },
@@ -94,7 +37,6 @@ export const Products: CollectionConfig = {
     {
       name: "shortDescription",
       type: "textarea",
-      index: true,
       admin: {
         description: "Brief description for cards and previews",
       },
@@ -104,12 +46,10 @@ export const Products: CollectionConfig = {
       type: "relationship",
       relationTo: "categories",
       required: true,
-      index: true,
     },
     {
       name: "brand",
       type: "text",
-      index: true,
     },
     {
       name: "model",
@@ -118,7 +58,6 @@ export const Products: CollectionConfig = {
     {
       name: "sku",
       type: "text",
-      index: true,
       admin: {
         description: "Stock Keeping Unit",
       },
@@ -131,7 +70,6 @@ export const Products: CollectionConfig = {
           name: "originalPrice",
           type: "number",
           required: true,
-          index: true,
           admin: {
             step: 0.01,
           },
@@ -140,7 +78,6 @@ export const Products: CollectionConfig = {
           name: "currentPrice",
           type: "number",
           required: true,
-          index: true,
           admin: {
             step: 0.01,
           },
@@ -148,7 +85,6 @@ export const Products: CollectionConfig = {
         {
           name: "discountPercentage",
           type: "number",
-          index: true,
           admin: {
             readOnly: true,
             description: "Automatically calculated",
@@ -161,7 +97,6 @@ export const Products: CollectionConfig = {
       type: "number",
       min: 0,
       max: 5,
-      index: true,
       admin: {
         step: 0.1,
       },
@@ -170,7 +105,6 @@ export const Products: CollectionConfig = {
       name: "reviewCount",
       type: "number",
       defaultValue: 0,
-      index: true,
     },
     {
       name: "images",
@@ -209,7 +143,6 @@ export const Products: CollectionConfig = {
         { label: "Other", value: "other" },
       ],
       required: true,
-      index: true,
     },
     {
       name: "features",
@@ -235,7 +168,6 @@ export const Products: CollectionConfig = {
           name: "isFeatured",
           type: "checkbox",
           defaultValue: false,
-          index: true,
           admin: {
             description: "Show on homepage featured section",
           },
@@ -244,7 +176,6 @@ export const Products: CollectionConfig = {
           name: "isTrending",
           type: "checkbox",
           defaultValue: false,
-          index: true,
           admin: {
             description: "Show in trending section",
           },
@@ -253,7 +184,6 @@ export const Products: CollectionConfig = {
           name: "isActive",
           type: "checkbox",
           defaultValue: true,
-          index: true,
           admin: {
             description: "Product is active and visible",
           },
@@ -278,7 +208,6 @@ export const Products: CollectionConfig = {
         },
       ],
     },
-    // High traffic analytics fields
     {
       name: "analytics",
       type: "group",
@@ -287,7 +216,6 @@ export const Products: CollectionConfig = {
           name: "viewCount",
           type: "number",
           defaultValue: 0,
-          index: true,
           admin: {
             readOnly: true,
           },
@@ -296,7 +224,6 @@ export const Products: CollectionConfig = {
           name: "clickCount",
           type: "number",
           defaultValue: 0,
-          index: true,
           admin: {
             readOnly: true,
           },
@@ -312,7 +239,6 @@ export const Products: CollectionConfig = {
         {
           name: "lastViewedAt",
           type: "date",
-          index: true,
           admin: {
             readOnly: true,
           },

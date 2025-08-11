@@ -10,48 +10,17 @@ export const Categories: CollectionConfig = {
   access: {
     read: () => true,
   },
-  // MongoDB indexes for high performance
-  indexes: [
-    {
-      fields: {
-        slug: 1,
-      },
-      options: {
-        unique: true,
-      },
-    },
-    {
-      fields: {
-        parent: 1,
-        level: 1,
-      },
-    },
-    {
-      fields: {
-        isActive: 1,
-        isFeatured: 1,
-      },
-    },
-    {
-      fields: {
-        sortOrder: 1,
-        level: 1,
-      },
-    },
-  ],
   fields: [
     {
       name: "name",
       type: "text",
       required: true,
-      index: true, // MongoDB text index for search
     },
     {
       name: "slug",
       type: "text",
       required: true,
       unique: true,
-      index: true,
       admin: {
         description: "URL-friendly version of the name",
       },
@@ -59,7 +28,6 @@ export const Categories: CollectionConfig = {
     {
       name: "description",
       type: "textarea",
-      index: true, // For search functionality
     },
     {
       name: "shortDescription",
@@ -117,7 +85,6 @@ export const Categories: CollectionConfig = {
       name: "parent",
       type: "relationship",
       relationTo: "categories",
-      index: true,
       admin: {
         description: "Parent category for subcategories",
       },
@@ -125,7 +92,6 @@ export const Categories: CollectionConfig = {
     {
       name: "level",
       type: "number",
-      index: true,
       admin: {
         readOnly: true,
         description: "Category depth level (0 = root, 1 = subcategory, etc.)",
@@ -136,13 +102,11 @@ export const Categories: CollectionConfig = {
       name: "isActive",
       type: "checkbox",
       defaultValue: true,
-      index: true,
     },
     {
       name: "isFeatured",
       type: "checkbox",
       defaultValue: false,
-      index: true,
       admin: {
         description: "Show in featured categories section",
       },
@@ -150,7 +114,6 @@ export const Categories: CollectionConfig = {
     {
       name: "productCount",
       type: "number",
-      index: true,
       admin: {
         readOnly: true,
         description: "Automatically calculated",
@@ -170,7 +133,6 @@ export const Categories: CollectionConfig = {
       name: "sortOrder",
       type: "number",
       defaultValue: 0,
-      index: true,
       admin: {
         description: "Display order (lower numbers first)",
       },
@@ -193,12 +155,10 @@ export const Categories: CollectionConfig = {
         },
       ],
     },
-    // High traffic optimization fields
     {
       name: "viewCount",
       type: "number",
       defaultValue: 0,
-      index: true,
       admin: {
         readOnly: true,
         description: "Page view count for analytics",
@@ -207,7 +167,6 @@ export const Categories: CollectionConfig = {
     {
       name: "lastViewedAt",
       type: "date",
-      index: true,
       admin: {
         readOnly: true,
         description: "Last time this category was viewed",
@@ -232,14 +191,10 @@ export const Categories: CollectionConfig = {
               collection: "categories",
               id: data.parent,
             })
-            if (!parent) {
-              throw new Error("Parent category not found")
-            }
-            data.parent = parent.id // Ensure parent is set correctly
+            data.level = (parent.level || 0) + 1
           } catch (error) {
-            console.error("Error fetching parent category:", error)
+            data.level = 1
           }
-          data.level = (parent.level || 0) + 1
         } else {
           data.level = 0
         }
@@ -247,29 +202,5 @@ export const Categories: CollectionConfig = {
         return data
       },
     ],
-    afterChange: [
-      async ({ doc, req, operation }) => {
-        // Update parent's subcategory count
-        if (doc.parent && operation === "create") {
-          const siblings = await req.payload.find({
-            collection: "categories",
-            where: {
-              parent: {
-                equals: doc.parent,
-              },
-            },
-          })
-
-          await req.payload.update({
-            collection: "categories",
-            id: doc.parent,
-            data: {
-              subcategoryCount: siblings.totalDocs,
-            },
-          })
-        }
-      },
-    ],
   },
-}
-
+} 

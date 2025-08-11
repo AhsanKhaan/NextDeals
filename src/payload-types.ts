@@ -69,6 +69,10 @@ export interface Config {
   collections: {
     users: User;
     media: Media;
+    categories: Category;
+    'newsletter-subscribers': NewsletterSubscriber;
+    'price-history': PriceHistory;
+    products: Product;
     'payload-locked-documents': PayloadLockedDocument;
     'payload-preferences': PayloadPreference;
     'payload-migrations': PayloadMigration;
@@ -77,6 +81,10 @@ export interface Config {
   collectionsSelect: {
     users: UsersSelect<false> | UsersSelect<true>;
     media: MediaSelect<false> | MediaSelect<true>;
+    categories: CategoriesSelect<false> | CategoriesSelect<true>;
+    'newsletter-subscribers': NewsletterSubscribersSelect<false> | NewsletterSubscribersSelect<true>;
+    'price-history': PriceHistorySelect<false> | PriceHistorySelect<true>;
+    products: ProductsSelect<false> | ProductsSelect<true>;
     'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
     'payload-preferences': PayloadPreferencesSelect<false> | PayloadPreferencesSelect<true>;
     'payload-migrations': PayloadMigrationsSelect<false> | PayloadMigrationsSelect<true>;
@@ -187,6 +195,228 @@ export interface Media {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "categories".
+ */
+export interface Category {
+  id: string;
+  name: string;
+  /**
+   * URL-friendly version of the name
+   */
+  slug: string;
+  description?: string | null;
+  /**
+   * Brief description for cards
+   */
+  shortDescription?: string | null;
+  icon?:
+    | (
+        | 'smartphone'
+        | 'laptop'
+        | 'headphones'
+        | 'camera'
+        | 'home'
+        | 'sofa'
+        | 'kitchen'
+        | 'garden'
+        | 'shirt'
+        | 'shoes'
+        | 'watch'
+        | 'bag'
+        | 'heart'
+        | 'sparkles'
+        | 'dumbbell'
+        | 'activity'
+        | 'book'
+        | 'music'
+      )
+    | null;
+  color?: ('blue' | 'green' | 'purple' | 'pink' | 'orange' | 'indigo' | 'red' | 'yellow') | null;
+  image?: (string | null) | Media;
+  /**
+   * Parent category for subcategories
+   */
+  parent?: (string | null) | Category;
+  /**
+   * Category depth level (0 = root, 1 = subcategory, etc.)
+   */
+  level?: number | null;
+  isActive?: boolean | null;
+  /**
+   * Show in featured categories section
+   */
+  isFeatured?: boolean | null;
+  /**
+   * Automatically calculated
+   */
+  productCount?: number | null;
+  /**
+   * Number of subcategories
+   */
+  subcategoryCount?: number | null;
+  /**
+   * Display order (lower numbers first)
+   */
+  sortOrder?: number | null;
+  seo?: {
+    title?: string | null;
+    description?: string | null;
+    keywords?: string | null;
+  };
+  /**
+   * Page view count for analytics
+   */
+  viewCount?: number | null;
+  /**
+   * Last time this category was viewed
+   */
+  lastViewedAt?: string | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "newsletter-subscribers".
+ */
+export interface NewsletterSubscriber {
+  id: string;
+  email: string;
+  firstName?: string | null;
+  lastName?: string | null;
+  isActive?: boolean | null;
+  preferences?: {
+    /**
+     * Categories user is interested in
+     */
+    categories?: (string | Category)[] | null;
+    frequency?: ('daily' | 'weekly' | 'monthly') | null;
+  };
+  source?: ('website' | 'social' | 'referral' | 'ad') | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "price-history".
+ */
+export interface PriceHistory {
+  id: string;
+  product: string | Product;
+  price: number;
+  source?: ('manual' | 'api' | 'csv' | 'scheduled') | null;
+  /**
+   * Price change from previous entry
+   */
+  priceChange?: number | null;
+  /**
+   * Percentage change from previous entry
+   */
+  priceChangePercentage?: number | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "products".
+ */
+export interface Product {
+  id: string;
+  /**
+   * Product name/title
+   */
+  title: string;
+  /**
+   * URL-friendly version of the title
+   */
+  slug: string;
+  /**
+   * Full product description
+   */
+  description?: {
+    root: {
+      type: string;
+      children: {
+        type: string;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  /**
+   * Brief description for cards and previews
+   */
+  shortDescription?: string | null;
+  category: string | Category;
+  brand?: string | null;
+  model?: string | null;
+  /**
+   * Stock Keeping Unit
+   */
+  sku?: string | null;
+  pricing: {
+    originalPrice: number;
+    currentPrice: number;
+    /**
+     * Automatically calculated
+     */
+    discountPercentage?: number | null;
+  };
+  rating?: number | null;
+  reviewCount?: number | null;
+  images?:
+    | {
+        image: string | Media;
+        alt: string;
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * Affiliate link to the product
+   */
+  affiliateUrl: string;
+  merchant: 'amazon' | 'ebay' | 'bestbuy' | 'target' | 'walmart' | 'other';
+  features?:
+    | {
+        name: string;
+        value: string;
+        id?: string | null;
+      }[]
+    | null;
+  status?: {
+    /**
+     * Show on homepage featured section
+     */
+    isFeatured?: boolean | null;
+    /**
+     * Show in trending section
+     */
+    isTrending?: boolean | null;
+    /**
+     * Product is active and visible
+     */
+    isActive?: boolean | null;
+  };
+  seo?: {
+    title?: string | null;
+    description?: string | null;
+    keywords?: string | null;
+  };
+  analytics?: {
+    viewCount?: number | null;
+    clickCount?: number | null;
+    conversionRate?: number | null;
+    lastViewedAt?: string | null;
+  };
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "payload-locked-documents".
  */
 export interface PayloadLockedDocument {
@@ -199,6 +429,22 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'media';
         value: string | Media;
+      } | null)
+    | ({
+        relationTo: 'categories';
+        value: string | Category;
+      } | null)
+    | ({
+        relationTo: 'newsletter-subscribers';
+        value: string | NewsletterSubscriber;
+      } | null)
+    | ({
+        relationTo: 'price-history';
+        value: string | PriceHistory;
+      } | null)
+    | ({
+        relationTo: 'products';
+        value: string | Product;
       } | null);
   globalSlug?: string | null;
   user: {
@@ -318,6 +564,132 @@ export interface MediaSelect<T extends boolean = true> {
               filename?: T;
             };
       };
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "categories_select".
+ */
+export interface CategoriesSelect<T extends boolean = true> {
+  name?: T;
+  slug?: T;
+  description?: T;
+  shortDescription?: T;
+  icon?: T;
+  color?: T;
+  image?: T;
+  parent?: T;
+  level?: T;
+  isActive?: T;
+  isFeatured?: T;
+  productCount?: T;
+  subcategoryCount?: T;
+  sortOrder?: T;
+  seo?:
+    | T
+    | {
+        title?: T;
+        description?: T;
+        keywords?: T;
+      };
+  viewCount?: T;
+  lastViewedAt?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "newsletter-subscribers_select".
+ */
+export interface NewsletterSubscribersSelect<T extends boolean = true> {
+  email?: T;
+  firstName?: T;
+  lastName?: T;
+  isActive?: T;
+  preferences?:
+    | T
+    | {
+        categories?: T;
+        frequency?: T;
+      };
+  source?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "price-history_select".
+ */
+export interface PriceHistorySelect<T extends boolean = true> {
+  product?: T;
+  price?: T;
+  source?: T;
+  priceChange?: T;
+  priceChangePercentage?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "products_select".
+ */
+export interface ProductsSelect<T extends boolean = true> {
+  title?: T;
+  slug?: T;
+  description?: T;
+  shortDescription?: T;
+  category?: T;
+  brand?: T;
+  model?: T;
+  sku?: T;
+  pricing?:
+    | T
+    | {
+        originalPrice?: T;
+        currentPrice?: T;
+        discountPercentage?: T;
+      };
+  rating?: T;
+  reviewCount?: T;
+  images?:
+    | T
+    | {
+        image?: T;
+        alt?: T;
+        id?: T;
+      };
+  affiliateUrl?: T;
+  merchant?: T;
+  features?:
+    | T
+    | {
+        name?: T;
+        value?: T;
+        id?: T;
+      };
+  status?:
+    | T
+    | {
+        isFeatured?: T;
+        isTrending?: T;
+        isActive?: T;
+      };
+  seo?:
+    | T
+    | {
+        title?: T;
+        description?: T;
+        keywords?: T;
+      };
+  analytics?:
+    | T
+    | {
+        viewCount?: T;
+        clickCount?: T;
+        conversionRate?: T;
+        lastViewedAt?: T;
+      };
+  updatedAt?: T;
+  createdAt?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema

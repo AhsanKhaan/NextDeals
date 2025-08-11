@@ -13,25 +13,25 @@ export const PriceHistory: CollectionConfig = {
     delete: ({ req: { user } }) => Boolean(user),
   },
   // MongoDB indexes for time-series data optimization
-  indexes: [
-    {
-      fields: {
-        product: 1,
-        createdAt: -1,
-      },
-    },
-    {
-      fields: {
-        createdAt: -1,
-      },
-    },
-    {
-      fields: {
-        product: 1,
-        price: 1,
-      },
-    },
-  ],
+  // indexes: [
+  //   {
+  //     fields: {
+  //       product: 1,
+  //       createdAt: -1,
+  //     },
+  //   },
+  //   {
+  //     fields: {
+  //       createdAt: -1,
+  //     },
+  //   },
+  //   {
+  //     fields: {
+  //       product: 1,
+  //       price: 1,
+  //     },
+  //   },
+  // ],
   fields: [
     {
       name: "product",
